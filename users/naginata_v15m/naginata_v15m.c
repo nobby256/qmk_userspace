@@ -315,6 +315,13 @@ const PROGMEM naginata_keymap ngmap[] = {
   {.key = B_X|B_I       , .func = ng_send_hyo   },  // ひょ
   {.key = B_B|B_I       , .func = ng_send_myo   },  // みょ
 
+  // (拡張)外来音
+  {.key = B_T|B_O,      .func = ng_send_fe    },  // ふぇ
+  {.key = B_T|B_P,      .func = ng_send_fyu   },  // ふゅ
+  {.key = B_T|B_J,      .func = ng_send_fa    },  // ふぁ
+  {.key = B_T|B_K,      .func = ng_send_fi    },  // ふぃ
+  {.key = B_T|B_N,      .func = ng_send_fo    },  // ふぉ
+
   // 機能部分
   {.key = B_H|B_J       , .func = naginata_on},   //　かなオン
   {.key = B_F|B_G       , .func = naginata_off},  //　かなオフ
