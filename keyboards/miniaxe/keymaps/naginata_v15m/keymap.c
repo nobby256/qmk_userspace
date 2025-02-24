@@ -35,6 +35,7 @@
      NG_EDIT_KAKUTEI_END,
      NG_KATAKANA,
      NG_HIRAGANA,
+     NG_IME_CANCEL,
      NG_QUESTION_MARK,
      NG_EXCLAMATION_MARK,
      NG_LEFT_CORNAR_BRACKET,
@@ -83,7 +84,7 @@ enum combos {
   CMB_ALTTAB
 };
 // Alt+Tab
-// const uint16_t PROGMEM combo_alttab[] = {NG_OFF, KC_Q, COMBO_END};
+const uint16_t PROGMEM combo_alttab[] = {NG_OFF, KC_Q, COMBO_END};
 // ENT
 const uint16_t PROGMEM combo_ent[] = {KC_V, KC_M, COMBO_END}; //薙刀式のレイヤーではMod+ENTの為に有用
  // ADJUST(ファンクション)
@@ -98,7 +99,7 @@ const uint16_t PROGMEM combo_tab[]= {KC_Q, KC_W, COMBO_END};
 const uint16_t PROGMEM combo_esc[]= {KC_O, KC_P, COMBO_END};
 
 combo_t key_combos[] = {
-  // COMBO(combo_alttab, KC_NO),
+  COMBO(combo_alttab, KC_NO),
   COMBO(combo_ent, KC_ENT),
   COMBO(combo_func, MO(_FUNCTION)),
   COMBO(combo1_edit_r1, MO(_EDIT_R1)),
@@ -246,7 +247,7 @@ LSFT_T(KC_P0), KC_P1, KC_P2,  KC_P3,      JP_GRV,    XXXXXXX, KC_PMNS, KC_COMM, 
     // XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        NG_EDIT_DELETE_TO_END, KC_BSPC, LGUI(KC_SLSH),         KC_DEL,     LSFT(KC_ESC),
     // XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        KC_LEFT,               KC_DOWN, KC_UP,                 KC_RIGHT,   NG_EDIT_KAKUTEI_END,
     // KC_LSFT,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        KC_HOME,               KC_END,  NG_EDIT_DELETE_TO_END, LCTL(KC_U), LCTL(KC_I),
-    XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        NG_EDIT_DELETE_TO_END, KC_BSPC,  LGUI(KC_SLSH),  KC_DEL,  KC_ESC,
+    XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        NG_EDIT_DELETE_TO_END, KC_BSPC,  LGUI(KC_SLSH),  KC_DEL,  NG_IME_CANCEL,
     XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        NG_EDIT_KAKUTEI_END,   KC_LEFT,  LSFT(KC_LEFT),  XXXXXXX, LCTL(KC_I),
     XXXXXXX,     XXXXXXX,    XXXXXXX,   XXXXXXX,    XXXXXXX,        KC_HOME,               KC_RIGHT, LSFT(KC_RIGHT), KC_END,  LCTL(KC_U),
                             _______,    _______,    _______,        _______,               _______, _______
@@ -288,12 +289,12 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
   switch (combo_index) {
     case CMB_ALTTAB:
       if (pressed) {
-        //register_mods(MOD_LALT);
-        register_code(KC_LALT);
+        register_mods(MOD_LALT);
+        //register_code(KC_LALT);
         tap_code(KC_TAB);
       } else {
-        //unregister_mods(MOD_LALT);
-        unregister_code(KC_LALT);
+        unregister_mods(MOD_LALT);
+        //unregister_code(KC_LALT);
       }
       break;
   }
@@ -303,9 +304,6 @@ bool process_combo_key_repress(uint16_t combo_index, combo_t *combo, uint8_t key
   switch (combo_index) {
     case CMB_ALTTAB:
       switch (keycode) {
-        case NG_OFF:
-          tap_code16(S(KC_TAB));
-          return true;
         case KC_Q:
           tap_code(KC_TAB);
           return true;
@@ -333,16 +331,16 @@ bool process_combo_key_repress(uint16_t combo_index, combo_t *combo, uint8_t key
 //     return state;
 //  }
 
- bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
  //   static bool is_us2jis = true;
- #ifdef CONSOLE_ENABLE
-   const uint16_t key_timer = timer_read();  // 時間測定開始;
-   uprintf("KL: kc: 0x%04X, col: %u, row: %u, pressed: %i, time: %u, interrupt: %i, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
- #endif
-   bool cont = true;
+#ifdef CONSOLE_ENABLE
+  const uint16_t key_timer = timer_read();  // 時間測定開始;
+  uprintf("KL: kc: 0x%04X, col: %u, row: %u, pressed: %i, time: %u, interrupt: %i, count: %u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count);
+#endif
+  bool cont = true;
 
-   const bool pressed = record->event.pressed;
-   switch (keycode) {
+  const bool pressed = record->event.pressed;
+  switch (keycode) {
      // case US_KEY:
      //   if (pressed) {
      //     is_us2jis = false;
@@ -383,150 +381,158 @@ bool process_combo_key_repress(uint16_t combo_index, combo_t *combo, uint8_t key
      //      return false;
      //    }
      //    break;
-     case NG_EDIT_KAKUTEI_END:
-       {
-         if (pressed) {
-           if (naginata_state()) {
-             ng_edit_kakutei_end();
-           } else {
-             tap_code(KC_END);
-           }
-           return false;
-        }
-       }
-       break;
-     case NG_EDIT_DELETE_TO_END:
-       {
-         if (pressed) {
-           ng_edit_delete_to_end();
-           return false;
-         }
-       }
-       break;
-     case NG_QUESTION_MARK:
-       {
-         if (pressed) {
-           if(naginata_state()){
-             ng_question_mark();
-           }else{
-             tap_code16(LSFT(KC_SLASH));
-           }
-         }
-         return false;
-       }
-       break;
-     case NG_EXCLAMATION_MARK:
-       {
-         if (pressed) {
-            if(naginata_state()){
-              ng_exclamation_mark();
-            }else{
-              tap_code16(LSFT(JP_EXLM));
-            }
-            return false;
-          }
-       }
-       break;
-     case NG_LEFT_CORNAR_BRACKET:
-       {
-         if (pressed) {
-//            tap_code16(JP_LBRC);
-            tap_code16(JP_LBRC);
-            tap_code16(JP_RBRC);
-           if(naginata_state()){
-             tap_code(KC_ENT);
-           }
-           ng_back_cursor();
-           return false;
-         }
-       }
-       break;
-     case NG_RIGHT_CORNAR_BRACKET:
-       {
-          if (pressed) {
-            tap_code16(JP_RBRC);
-            if(naginata_state()){
-              tap_code(KC_ENT);
-            }
-            return false;
-          }
-       }
-       break;
-     case NG_LEFT_PARANTHESIS:
-       {
-         if (pressed) {
-//           tap_code16(JP_LPRN);
-           tap_code16(JP_LPRN);
-           tap_code16(JP_RPRN);
-           if(naginata_state()){
-             tap_code(KC_ENT);
-           }
-           ng_back_cursor();
-           return false;
-         }
-       }
-       break;
-     case NG_RIGHT_PARANTHESIS:
-       {
-         if (pressed) {
-           tap_code16(JP_RPRN);
-           if(naginata_state()){
-             tap_code(KC_ENT);
-           }
-           return false;
-         }
-       }
-       break;
-     case KC_HOME:
-     case KC_END:
-       if (get_mods() & MOD_MASK_CTRL) {
-         return false; // CTLによる暴発防止
-       }
-       break;
-    case NG_OFF:
-       {
-          static uint16_t key_pressed_time;
-          if (pressed) {
-            key_pressed_time = record->event.time;
-            // process_magimata()にこのキーコードを渡す必要がある。return falseをしないこと。
-            //process_naginata(KC_LCTL, record);
-            //register_code(KC_LCTL);
-            layer_on(_LOWER);
+    case NG_EDIT_KAKUTEI_END:
+      {
+        if (pressed) {
+          if (naginata_state()) {
+            ng_edit_kakutei_end();
           } else {
-            //process_naginata(KC_LCTL, record);
-            //unregister_code(KC_LCTL);
-            layer_off(_LOWER);
-            if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
-               naginata_off();
-            }
+            tap_code(KC_END);
+          }
+          return false;
+       }
+      }
+      break;
+    case NG_EDIT_DELETE_TO_END:
+      {
+        if (pressed) {
+          ng_edit_delete_to_end();
+          return false;
+        }
+      }
+      break;
+    case NG_IME_CANCEL:
+      {
+        if (pressed) {
+          ng_ime_cancel();
+          return false;
+        }
+      }
+      break;
+    case NG_QUESTION_MARK:
+      {
+        if (pressed) {
+          if(naginata_state()){
+            ng_question_mark();
+          }else{
+            tap_code16(LSFT(KC_SLASH));
+          }
+        }
+        return false;
+      }
+      break;
+    case NG_EXCLAMATION_MARK:
+      {
+        if (pressed) {
+          if(naginata_state()){
+            ng_exclamation_mark();
+          }else{
+            tap_code16(LSFT(JP_EXLM));
           }
           return false;
         }
-       break;
-     case NG_SHFT2:
-       {
-         static uint16_t key_pressed_time;
-         if (pressed) {
-           key_pressed_time = record->event.time;
-           layer_on(_RAISE);
-         } else {
-           layer_off(_RAISE);
-           if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
-             if(naginata_state()){
-               record->event.pressed=true;
-               process_naginata(NG_SHFT2, record);
-               record->event.pressed=false;
-               process_naginata(NG_SHFT2, record);
-             } else {
-               tap_code(KC_ENT);
-             }
-           }
-         }
-         return false;
-        }
+      }
       break;
-     case KC_SCLN: // 日本語キーボードで SHIFT + ; -> :
-       {
+    case NG_LEFT_CORNAR_BRACKET:
+      {
+        if (pressed) {
+//        tap_code16(JP_LBRC);
+          tap_code16(JP_LBRC);
+          tap_code16(JP_RBRC);
+          if(naginata_state()){
+            tap_code(KC_ENT);
+          }
+          ng_back_cursor();
+          return false;
+        }
+      }
+      break;
+    case NG_RIGHT_CORNAR_BRACKET:
+      {
+        if (pressed) {
+          tap_code16(JP_RBRC);
+          if(naginata_state()){
+            tap_code(KC_ENT);
+          }
+          return false;
+        }
+      }
+      break;
+    case NG_LEFT_PARANTHESIS:
+      {
+        if (pressed) {
+//        tap_code16(JP_LPRN);
+          tap_code16(JP_LPRN);
+          tap_code16(JP_RPRN);
+          if(naginata_state()){
+            tap_code(KC_ENT);
+          }
+          ng_back_cursor();
+          return false;
+        }
+      }
+      break;
+    case NG_RIGHT_PARANTHESIS:
+      {
+        if (pressed) {
+          tap_code16(JP_RPRN);
+          if(naginata_state()){
+            tap_code(KC_ENT);
+          }
+          return false;
+        }
+      }
+      break;
+    case KC_HOME:
+    case KC_END:
+      if (get_mods() & MOD_MASK_CTRL) {
+        return false; // CTLによる暴発防止
+      }
+      break;
+    case NG_OFF:
+      {
+        static uint16_t key_pressed_time;
+        if (pressed) {
+          key_pressed_time = record->event.time;
+          // process_magimata()にこのキーコードを渡す必要がある。return falseをしないこと。
+          //process_naginata(KC_LCTL, record);
+          //register_code(KC_LCTL);
+          layer_on(_LOWER);
+        } else {
+          //process_naginata(KC_LCTL, record);
+          //unregister_code(KC_LCTL);
+          layer_off(_LOWER);
+          if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
+            naginata_off();
+          }
+        }
+        return false;
+      }
+      break;
+    case NG_SHFT2:
+      {
+        static uint16_t key_pressed_time;
+        if (pressed) {
+          key_pressed_time = record->event.time;
+          layer_on(_RAISE);
+        } else {
+          layer_off(_RAISE);
+          if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
+            if(naginata_state()){ //TODO:薙刀モードが有効である事と薙刀レイヤーである事はイコールではない。薙刀レイヤー以外の場合はShift+Enterになるように修正する必要性がある
+              record->event.pressed=true;
+              process_naginata(NG_SHFT2, record);
+              record->event.pressed=false;
+              process_naginata(NG_SHFT2, record);
+            } else {
+              tap_code(KC_ENT);
+            }
+          }
+        }
+        return false;
+      }
+      break;
+    case KC_SCLN: // 日本語キーボードで SHIFT + ; -> :
+      {
         static bool coln_registered;
         uint8_t mod_state = get_mods();
         if (record->event.pressed) {
@@ -547,60 +553,38 @@ bool process_combo_key_repress(uint16_t combo_index, combo_t *combo, uint8_t key
           }
         }
       }
-       break;
-     case KC_SLSH: // SHIFT+/ で _
-       {
-         static bool sft_registered;
-         static uint16_t key_pressed_time;
-         if (record->event.pressed) {
-           key_pressed_time = record->event.time;
-           if (!(get_mods() & MOD_MASK_SHIFT)) {
-             register_code(KC_LSFT);
-             sft_registered=true;
-           }
-         } else {
-           if (sft_registered) {
-             unregister_code(KC_LSFT);
-             sft_registered=false;
-           }
-           if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
-             uint8_t mod_state = get_mods();
-             if (mod_state & MOD_MASK_SHIFT) {
-               del_mods(MOD_MASK_SHIFT);
-               tap_code16(JP_UNDS);
-               set_mods(mod_state);
-             } else {
-               del_mods(MOD_MASK_SHIFT);
-               tap_code(KC_SLSH);
-             }
-           }
-         }
-         return false;
-       }
-       break;
-     case KC_Q:
-     case NG_Q:
-     case KC_P:
-     case NG_P:
-       {
-         static bool tabkey_registered;
-         if (pressed) {
-           uint8_t mod_state = get_mods();
-           if ((mod_state & MOD_MASK_ALT) || (mod_state & MOD_MASK_CTRL)) {
-             register_code(KC_TAB);
-             tabkey_registered = true;
-             return false;
-           }
-         } else {
-           if (tabkey_registered) {
-             unregister_code(KC_TAB);
-             tabkey_registered = false;
-             return false;
-           }
-         }
-       }
-       break;
-   }
+      break;
+    case KC_SLSH: // SHIFT+/ で _
+      {
+        static bool sft_registered;
+        static uint16_t key_pressed_time;
+        if (record->event.pressed) {
+          key_pressed_time = record->event.time;
+          if (!(get_mods() & MOD_MASK_SHIFT)) {
+            register_code(KC_LSFT);
+            sft_registered=true;
+          }
+        } else {
+          if (sft_registered) {
+            unregister_code(KC_LSFT);
+            sft_registered=false;
+          }
+          if (TIMER_DIFF_16(record->event.time, key_pressed_time) < TAPPING_TERM) {
+            uint8_t mod_state = get_mods();
+            if (mod_state & MOD_MASK_SHIFT) {
+              del_mods(MOD_MASK_SHIFT);
+              tap_code16(JP_UNDS);
+              set_mods(mod_state);
+            } else {
+              del_mods(MOD_MASK_SHIFT);
+              tap_code(KC_SLSH);
+            }
+          }
+        }
+        return false;
+      }
+      break;
+  }
 
    // 薙刀式 begin 4
    if (cont) {
@@ -613,53 +597,53 @@ bool process_combo_key_repress(uint16_t combo_index, combo_t *combo, uint8_t key
  //     cont = twpair_on_jis(keycode, record);
  //   }
 
- #ifdef CONSOLE_ENABLE
-   uprintf("%c%ums\n", pressed ? '*' : ' ', timer_elapsed(key_timer));  // 経過時間表示
- #endif
-   return cont;
- }
+#ifdef CONSOLE_ENABLE
+  uprintf("%c%ums\n", pressed ? '*' : ' ', timer_elapsed(key_timer));  // 経過時間表示
+#endif
+  return cont;
+}
 
- #ifdef CONSOLE_ENABLE
- void keyboard_post_init_user(void) {
-   // Customise these values to desired behaviour
-   debug_enable=true;
-   // debug_matrix=true;
-   //debug_keyboard=true;
-   //debug_mouse=true;
- }
- #endif
+#ifdef CONSOLE_ENABLE
+void keyboard_post_init_user(void) {
+  // Customise these values to desired behaviour
+  debug_enable=true;
+  // debug_matrix=true;
+  //debug_keyboard=true;
+  //debug_mouse=true;
+}
+#endif
 
- // 全ての QMK 処理の最後に、次の繰り返しを開始する前に呼び出される関数
- void housekeeping_task_user(void) {
-   // 薙刀式 begin 5
-   // 後置シフト待ち処理
-   kouchi_shift_loop();
-   // 薙刀式 end 5
- }
+// 全ての QMK 処理の最後に、次の繰り返しを開始する前に呼び出される関数
+void housekeeping_task_user(void) {
+  // 薙刀式 begin 5
+  // 後置シフト待ち処理
+  kouchi_shift_loop();
+  // 薙刀式 end 5
+}
 
- void matrix_init_user(void) {
-     // 薙刀式 begin 6
-     uint16_t ngonkeys[] = {KC_H, KC_J};
-     uint16_t ngoffkeys[] = {KC_F, KC_G};
-     set_naginata(_NAGINATA, ngonkeys, ngoffkeys);
+void matrix_init_user(void) {
+  // 薙刀式 begin 6
+  uint16_t ngonkeys[] = {KC_H, KC_J};
+  uint16_t ngoffkeys[] = {KC_F, KC_G};
+  set_naginata(_NAGINATA, ngonkeys, ngoffkeys);
 
-     // 自動でOSによってレイヤーや薙刀式の設定を切り替える
-   #ifdef OS_DETECTION_ENABLE
-     wait_ms(400);
-     switch (detected_host_os()) {
-       case OS_WINDOWS:
-         switchOS(NG_WIN);
-         break;
-       case OS_MACOS:
-       case OS_IOS:
-         switchOS(NG_MAC);
-         break;
-       case OS_LINUX:
-         switchOS(NG_LINUX);
-         break;
-       default:
-         break;
-     }
-   #endif
-     // 薙刀式 end 6
-   }
+  // 自動でOSによってレイヤーや薙刀式の設定を切り替える
+#ifdef OS_DETECTION_ENABLE
+  wait_ms(400);
+    switch (detected_host_os()) {
+      case OS_WINDOWS:
+        switchOS(NG_WIN);
+        break;
+      case OS_MACOS:
+      case OS_IOS:
+        switchOS(NG_MAC);
+        break;
+      case OS_LINUX:
+        switchOS(NG_LINUX);
+        break;
+      default:
+        break;
+    }
+#endif
+  // 薙刀式 end 6
+}

@@ -35,6 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TRI_LAYER_ADJUST_LAYER 4
 
 #define COMBO_ONLY_FROM_LAYER 0
-//#define COMBO_PROCESS_KEY_REPRESS
-//#define COMBO_TERM_PER_COMBO
+#define COMBO_PROCESS_KEY_REPRESS
+#define COMBO_TERM_PER_COMBO
 //#define COMBO_MUST_PRESS_IN_ORDER_PER_COMBO
