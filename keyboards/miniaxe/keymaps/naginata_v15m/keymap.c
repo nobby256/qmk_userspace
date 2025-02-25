@@ -226,7 +226,7 @@ LSFT_T(KC_P0), KC_P1, KC_P2,  KC_P3,      JP_GRV,    XXXXXXX, KC_PMNS, KC_COMM, 
  [_NAGINATA] = LAYOUT_split_3x5_3(
    NG_Q,     NG_W,   NG_E,    NG_R,    NG_T,          NG_Y,    NG_U,    NG_I,    NG_O,   NG_P,
    NG_A,     NG_S,   NG_D,    NG_F,    NG_G,          NG_H,    NG_J,    NG_K,    NG_L, NG_SCLN,
-   NG_Z,     NG_X,   NG_C,    NG_V,    NG_B,          NG_N,    NG_M, NG_COMM,  NG_DOT, NG_SLSH,
+   LSFT_T(NG_Z),     NG_X,   NG_C,    NG_V,    NG_B,          NG_N,    NG_M, NG_COMM,  NG_DOT, LSFT_T(NG_SLSH),
                      _______, NG_SHFT,_______,       _______, _______, _______
    ),
  // 薙刀式 end 3
@@ -344,6 +344,28 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   const bool pressed = record->event.pressed;
   switch (keycode) {
+    case LSFT_T(NG_Z):
+    case LSFT_T(NG_SLSH):
+      {
+        uint16_t tap_code = (keycode == LSFT_T(NG_Z)) ? NG_Z : NG_SLSH;
+        if(pressed){
+          if(record->tap.count){
+            process_naginata(tap_code, record);
+          } else {
+            process_naginata(KC_LSFT, record);
+            register_code(KC_LSFT);
+          }
+        } else {
+          if(record->tap.count){
+            process_naginata(tap_code, record);
+          } else {
+            process_naginata(KC_LSFT, record);
+            unregister_code(KC_LSFT);
+          }
+        }
+        return false;
+      }
+      break;
      // case US_KEY:
      //   if (pressed) {
      //     is_us2jis = false;
