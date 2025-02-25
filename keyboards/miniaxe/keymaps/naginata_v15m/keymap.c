@@ -87,9 +87,11 @@ enum combos {
 const uint16_t PROGMEM combo_alttab[] = {NG_OFF, KC_Q, COMBO_END};
 // ENT
 const uint16_t PROGMEM combo_ent[] = {KC_V, KC_M, COMBO_END}; //薙刀式のレイヤーではMod+ENTの為に有用
- // ADJUST(ファンクション)
+ // ADJUST(ファンクション 右面)
 const uint16_t PROGMEM combo_func[] = {KC_K, KC_L, COMBO_END};
-// 編集モード(右面1)
+ // ADJUST(ファンクション 左面)
+ const uint16_t PROGMEM combo_func2[] = {KC_S, KC_D, COMBO_END};
+ // 編集モード(右面1)
 const uint16_t PROGMEM combo1_edit_r1[]= {KC_D, KC_F, COMBO_END};
 // 編集モード(左面1)
 const uint16_t PROGMEM combo1_edit_l1[]= {KC_J, KC_K, COMBO_END};
@@ -102,6 +104,7 @@ combo_t key_combos[] = {
   COMBO(combo_alttab, KC_NO),
   COMBO(combo_ent, KC_ENT),
   COMBO(combo_func, MO(_FUNCTION)),
+  COMBO(combo_func2, MO(_FUNCTION)),
   COMBO(combo1_edit_r1, MO(_EDIT_R1)),
   COMBO(combo1_edit_l1, MO(_EDIT_L1)),
   COMBO(combo_tab, KC_TAB),
@@ -213,9 +216,9 @@ LSFT_T(KC_P0), KC_P1, KC_P2,  KC_P3,      JP_GRV,    XXXXXXX, KC_PMNS, KC_COMM, 
   *               `--------------------'           `--------------------'
   */
  [_FUNCTION] =  LAYOUT_split_3x5_3(
-   KC_F1,   KC_F2,   KC_F3,   KC_F4,   XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX, LCTL(KC_HOME), KC_PGUP,
-   KC_F5,   KC_F6,   KC_F7,   KC_F8,   XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX, LCTL(KC_END),  KC_PGDN,
-   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_PSCR,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+   KC_F1,   KC_F2,   KC_F3,   KC_F4,   XXXXXXX,   NGSW_WIN, XXXXXXX, XXXXXXX, LCTL(KC_HOME), KC_PGUP,
+   KC_F5,   KC_F6,   KC_F7,   KC_F8,   XXXXXXX,   NG_TAYO, XXXXXXX, XXXXXXX, LCTL(KC_END),  KC_PGDN,
+   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_PSCR,   NG_SHOS, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
                      KC_LALT, KC_LSFT, KC_LCTL,   KC_LSFT, KC_LCTL, KC_LALT
  ),
 
@@ -261,7 +264,7 @@ LSFT_T(KC_P0), KC_P1, KC_P2,  KC_P3,      JP_GRV,    XXXXXXX, KC_PMNS, KC_COMM, 
   ),
 
   [_EDIT_L1] = LAYOUT_split_3x5_3(
-    LCTL(KC_HOME), LCTL(KC_END), XXXXXXX,             KC_SLSH,                XXXXXXX,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,
+    LCTL(KC_HOME), LCTL(KC_END), XXXXXXX,             XXXXXXX,                KC_SLSH,                     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,
     XXXXXXX,       JP_TILD,      NG_QUESTION_MARK,    NG_LEFT_PARANTHESIS,    NG_RIGHT_PARANTHESIS,        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,
     XXXXXXX,       XXXXXXX,      NG_EXCLAMATION_MARK, NG_LEFT_CORNAR_BRACKET, NG_RIGHT_CORNAR_BRACKET,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX,
                                  _______,             _______,                _______,                     _______, _______, _______
