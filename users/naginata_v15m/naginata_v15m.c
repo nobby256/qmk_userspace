@@ -315,6 +315,13 @@ const PROGMEM naginata_keymap ngmap[] = {
   {.key = B_X|B_I       , .func = ng_send_hyo   },  // ひょ
   {.key = B_B|B_I       , .func = ng_send_myo   },  // みょ
 
+  // (拡張)外来音
+  {.key = B_T|B_O,      .func = ng_send_fe    },  // ふぇ
+  {.key = B_T|B_P,      .func = ng_send_fyu   },  // ふゅ
+  {.key = B_T|B_J,      .func = ng_send_fa    },  // ふぁ
+  {.key = B_T|B_K,      .func = ng_send_fi    },  // ふぃ
+  {.key = B_T|B_N,      .func = ng_send_fo    },  // ふぉ
+
   // 機能部分
   {.key = B_H|B_J       , .func = naginata_on},   //　かなオン
   {.key = B_F|B_G       , .func = naginata_off},  //　かなオフ
@@ -932,7 +939,7 @@ bool naginata_type(uint16_t keycode, keyrecord_t *record) {
       if (pressing) {
         center_shift_count++;
         recent_key = B_SHFT;
-        ng_center_keycode = (keycode == NG_SHFT ? KC_SPACE : KC_ENTER);
+        ng_center_keycode = (keycode == NG_SHFT ? KC_NO : KC_ENTER);
       } else if (center_shift_count) {
         center_shift_count--;
         if (!center_shift_count) {
